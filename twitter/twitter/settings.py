@@ -99,14 +99,14 @@ FEED_EXPORT_ENCODING = "utf-8"
 
 SELENIUM_DRIVER_NAME = 'chrome'
 SELENIUM_DRIVER_EXECUTABLE_PATH = which('chromedriver')
-# SELENIUM_DRIVER_ARGUMENTS=[
-#     '--headless',
-#     '--disable-gpu',
-#     'window-size=1920x1080',
-#     '--start-maximized',
-#     'user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
-#     ]  
-SELENIUM_DRIVER_ARGUMENTS=[]  
+SELENIUM_DRIVER_ARGUMENTS=[
+    '--headless',
+    '--disable-gpu',
+    'window-size=1920x1080',
+    '--start-maximized',
+    'user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
+    ]  
+# SELENIUM_DRIVER_ARGUMENTS=[]  
   
 DOWNLOADER_MIDDLEWARES = {
     'scrapy_selenium.SeleniumMiddleware': 800

@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import json
+import os
 
 # 获取用户粉丝爬虫，只能获取最新的50条数据
 class PostSpider(scrapy.Spider):
@@ -15,9 +16,11 @@ class PostSpider(scrapy.Spider):
 
     def start_requests(self):
         url = "https://x.com"
-        with open('cookiefile.json', 'r') as file:
-            cookies = json.load(file)
-        self.cookies = [{'key':cookie['name'], 'value':cookie['value']} for cookie in cookies]
+        file_path = 'cookiefile.json'
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as file:
+                cookies = json.load(file)
+            self.cookies = [{'key':cookie['name'], 'value':cookie['value']} for cookie in cookies]
         
         yield SeleniumRequest(url=url, callback=self.do_login)
         
@@ -91,7 +94,7 @@ class PostSpider(scrapy.Spider):
         print("x_email:",x_email)
         print("x_password:",x_password)
         print("x_username:",x_username)
-        
+
         driver = response.request.meta["driver"]
         wait = WebDriverWait(driver, 60)  # 设置最大等待时间为10秒
     

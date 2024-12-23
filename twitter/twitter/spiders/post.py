@@ -88,7 +88,10 @@ class PostSpider(scrapy.Spider):
         x_email = self.crawler.settings.get('X_EMAIL')
         x_password = self.crawler.settings.get('X_PASSWORD')
         x_username = self.crawler.settings.get('X_USERNAME')
-
+        print("x_email:",x_email)
+        print("x_password:",x_password)
+        print("x_username:",x_username)
+        return
         driver = response.request.meta["driver"]
         wait = WebDriverWait(driver, 60)  # 设置最大等待时间为10秒
     

@@ -19,9 +19,9 @@ class PostSpider(scrapy.Spider):
             cookies = json.load(file)
         self.cookies = [{'key':cookie['name'], 'value':cookie['value']} for cookie in cookies]
         
-        yield SeleniumRequest(url=url, callback=self.parse)
+        yield SeleniumRequest(url=url, callback=self.do_login)
         
-    def parse(self, response):
+    def post_replay(self, response):
         driver = response.request.meta["driver"]
         # 给浏览器添加Cookie
         if hasattr(self, 'cookies'):
@@ -57,7 +57,7 @@ class PostSpider(scrapy.Spider):
         reply_button.click()
         time.sleep(100)
 
-    def parse1(self, response):
+    def send_post(self, response):
         driver = response.request.meta["driver"]
         # 给浏览器添加Cookie
         if hasattr(self, 'cookies'):

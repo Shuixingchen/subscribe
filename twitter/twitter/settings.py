@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+import os
+load_dotenv()
 # Scrapy settings for twitter project
 #
 # For simplicity, this file contains only settings considered important or
@@ -109,6 +112,6 @@ DOWNLOADER_MIDDLEWARES = {
     'scrapy_selenium.SeleniumMiddleware': 800
 }
 
-X_EMAIL = "13539456958csx1@gmail.com"
-X_USERNAME = "one2web"
-X_PASSWORD = "625625.com"
+X_EMAIL = os.getenv("X_EMAIL")
+X_USERNAME = os.getenv("X_USERNAME")
+X_PASSWORD = os.getenv("X_PASSWORD")

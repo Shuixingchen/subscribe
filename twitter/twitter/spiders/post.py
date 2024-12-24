@@ -16,8 +16,7 @@ class PostSpider(scrapy.Spider):
     start_urls = ["https://x.com/home","https://x.com"]
     def start_requests(self):
         url = "https://x.com"
-        # url = "https://x.com/i/flow/login"
-        file_path = 'cookiefile.json'
+        file_path = self.get_cookies_file(1)
         if os.path.exists(file_path):
             with open(file_path, 'r') as file:
                 cookies = json.load(file)
@@ -230,3 +229,7 @@ class PostSpider(scrapy.Spider):
         # 保存headers到json文件
         with open('headers.json', 'w') as file:
             json.dump(headers_dict, file, indent=4)
+
+
+    def get_cookies_file(self,uid:int):
+        return f"cookies/{uid}.json"

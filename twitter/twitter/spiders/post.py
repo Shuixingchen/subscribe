@@ -33,10 +33,10 @@ class PostSpider(scrapy.Spider):
                 continue
             if reply['content'] == "":
                 continue
-            status_id = self.post_replay(response,reply)
-            if status_id == "":
+            origin_post_url = self.post_replay(response,reply)
+            if origin_post_url == "":
                 continue
-            reply['x_status_id'] = status_id
+            reply['origin_post_url'] = origin_post_url
             self.save_reply_log(reply)
     def post_replay(self, response, reply):
         try:
@@ -76,7 +76,7 @@ class PostSpider(scrapy.Spider):
             time.sleep(1)
             reply_button.click()
             time.sleep(3)
-            return last_url.split('/')[-1]
+            return last_url
         except Exception as e:
             print("Error: ", e)
             return ""
@@ -129,9 +129,9 @@ class PostSpider(scrapy.Spider):
     def save_reply_log(self, data):
         try:
             insert_log_sql = """
-            INSERT INTO t_reply_log (uid, content_id,x_status_id) VALUES (%s, %s,%s)
+            INSERT INTO t_reply_log (uid, content_id,origin_post_url) VALUES (%s, %s,%s)
             """
-            self.cursor.execute(insert_log_sql, (data['user_id'], data['content_id'], data['x_status_id']))
+            self.cursor.execute(insert_log_sql, (data['user_id'], data['content_id'], data['origin_post_url']))
             self.conn.commit()
         except Exception as e:
             print("Error: ", e)

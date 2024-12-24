@@ -2,5 +2,4 @@ __pycache__
 .env
 chromedriver*
 .json
-settings.py
 google-chrome*

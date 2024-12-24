@@ -15,7 +15,8 @@ class PostSpider(scrapy.Spider):
     start_urls = ["https://x.com/home","https://x.com"]
 
     def start_requests(self):
-        url = "https://x.com"
+        # url = "https://x.com"
+        url = "https://x.com/i/flow/login"
         file_path = 'cookiefile.json'
         if os.path.exists(file_path):
             with open(file_path, 'r') as file:
@@ -91,13 +92,9 @@ class PostSpider(scrapy.Spider):
         x_email = self.crawler.settings.get('X_EMAIL')
         x_password = self.crawler.settings.get('X_PASSWORD')
         x_username = self.crawler.settings.get('X_USERNAME')
-        print("x_email:",x_email)
-        print("x_password:",x_password)
-        print("x_username:",x_username)
-
         driver = response.request.meta["driver"]
         wait = WebDriverWait(driver, 60)  # 设置最大等待时间为10秒
-    
+
         # 找到登录用户名input
         email_input = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[autocomplete="username"]')))
         email_input.send_keys(x_email)

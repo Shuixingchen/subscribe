@@ -2,3 +2,4 @@ __pycache__
 .env
 chromedriver-mac*
 .json
+settings.py

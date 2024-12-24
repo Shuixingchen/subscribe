@@ -98,7 +98,9 @@ TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
 
 SELENIUM_DRIVER_NAME = 'chrome'
-SELENIUM_DRIVER_EXECUTABLE_PATH = which('chromedriver')
+# SELENIUM_DRIVER_EXECUTABLE_PATH = which('chromedriver')
+SELENIUM_DRIVER_EXECUTABLE_PATH = '/Users/admin/learn/subscribe/chromedriver-mac-x64'
+
 SELENIUM_DRIVER_ARGUMENTS=[
     '--headless',
     '--disable-gpu',

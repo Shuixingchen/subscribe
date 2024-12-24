@@ -107,7 +107,7 @@ SELENIUM_DRIVER_ARGUMENTS=[
     '--disable-gpu',
     'window-size=1920x1080',
     '--start-maximized',
-    'user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
+    'user-agent='+os.getenv("USER_AGENT")
     ]  
 # SELENIUM_DRIVER_ARGUMENTS=[]  
  

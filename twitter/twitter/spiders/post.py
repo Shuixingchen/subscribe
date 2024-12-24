@@ -27,6 +27,9 @@ class PostSpider(scrapy.Spider):
         
     def post_replay(self, response):
         driver = response.request.meta["driver"]
+        user_agent = driver.execute_script("return navigator.userAgent;")
+        print("User-Agent:", user_agent)
+        return
         # 给浏览器添加Cookie
         if hasattr(self, 'cookies'):
             for item in self.cookies:

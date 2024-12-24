@@ -15,15 +15,15 @@ class PostSpider(scrapy.Spider):
     start_urls = ["https://x.com/home","https://x.com"]
 
     def start_requests(self):
-        # url = "https://x.com"
-        url = "https://x.com/i/flow/login"
+        url = "https://x.com"
+        # url = "https://x.com/i/flow/login"
         file_path = 'cookiefile.json'
         if os.path.exists(file_path):
             with open(file_path, 'r') as file:
                 cookies = json.load(file)
             self.cookies = [{'key':cookie['name'], 'value':cookie['value']} for cookie in cookies]
         
-        yield SeleniumRequest(url=url, callback=self.do_login)
+        yield SeleniumRequest(url=url, callback=self.post_replay)
         
     def post_replay(self, response):
         driver = response.request.meta["driver"]
@@ -59,7 +59,7 @@ class PostSpider(scrapy.Spider):
         actions.move_to_element(reply_button).perform()
         time.sleep(1)
         reply_button.click()
-        time.sleep(100)
+        time.sleep(10)
 
     def send_post(self, response):
         driver = response.request.meta["driver"]

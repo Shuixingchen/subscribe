@@ -1,5 +1,6 @@
 __pycache__
 .env
-chromedriver-mac*
+chromedriver*
 .json
 settings.py
+google-chrome*

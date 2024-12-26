@@ -15,14 +15,18 @@ class PostSpider(scrapy.Spider):
     allowed_domains = ["x.com","sannysoft.com"]
     start_urls = ["https://x.com/home","https://x.com"]
     def start_requests(self):
+        self.mysql_init()
+        uid = self.get_user_id()
+        print("do post uid: ", uid)
+    
         url = "https://x.com"
-        file_path = self.get_cookies_file(1)
+        file_path = self.get_cookies_file(uid)
         if os.path.exists(file_path):
             with open(file_path, 'r') as file:
                 cookies = json.load(file)
             self.cookies = [{'key':cookie['name'], 'value':cookie['value']} for cookie in cookies]
         
-        yield SeleniumRequest(url=url, callback=self.do_post_reply)
+        yield SeleniumRequest(url=url, callback=self.send_post)
 
 
     def do_post_reply(self, response):  
@@ -82,20 +86,6 @@ class PostSpider(scrapy.Spider):
 
     def get_reply_list(self):
         try:
-            host = self.crawler.settings.get('X_MYSQL_HOST')
-            user = self.crawler.settings.get('X_MYSQL_USER')
-            password = self.crawler.settings.get('X_MYSQL_PASSWORD')
-            database = self.crawler.settings.get('X_MYSQL_DATABASE')
-            port = self.crawler.settings.get('X_MYSQL_PORT')
-            self.conn = pymysql.connect(
-                host=host,
-                user=user,
-                password=password,
-                database=database,
-                port=int(port),
-                cursorclass=pymysql.cursors.DictCursor
-            )
-            self.cursor = self.conn.cursor()
             query_big_user = """
             SELECT * from t_big_users
             """
@@ -230,6 +220,48 @@ class PostSpider(scrapy.Spider):
         with open('headers.json', 'w') as file:
             json.dump(headers_dict, file, indent=4)
 
+    def get_post_content(self,response):
+        host = self.crawler.settings.get('X_MYSQL_HOST')
+        user = self.crawler.settings.get('X_MYSQL_USER')
+        password = self.crawler.settings.get('X_MYSQL_PASSWORD')
+        database = self.crawler.settings.get('X_MYSQL_DATABASE')
+        port = self.crawler.settings.get('X_MYSQL_PORT')
+        self.conn = pymysql.connect(
+            host=host,
+            user=user,
+            password=password,
+            database=database,
+            port=int(port),
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        self.cursor = self.conn.cursor()
+        
 
     def get_cookies_file(self,uid:int):
         return f"cookies/{uid}.json"
+    
+    def get_user_id(self):
+        try:
+            query_user_id = """
+            SELECT id from t_users where status = 1
+            """
+            self.cursor.execute(query_user_id,())
+            user_id = self.cursor.fetchone()
+            return user_id['id']
+        except Exception as e:
+            print("Error: ", e)
+    def mysql_init(self):
+        host = self.crawler.settings.get('X_MYSQL_HOST')
+        user = self.crawler.settings.get('X_MYSQL_USER')
+        password = self.crawler.settings.get('X_MYSQL_PASSWORD')
+        database = self.crawler.settings.get('X_MYSQL_DATABASE')
+        port = self.crawler.settings.get('X_MYSQL_PORT')
+        self.conn = pymysql.connect(
+            host=host,
+            user=user,
+            password=password,
+            database=database,
+            port=int(port),
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        self.cursor = self.conn.cursor()

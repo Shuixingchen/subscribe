@@ -25,7 +25,9 @@ class ReplySpider(scrapy.Spider):
             with open(file_path, 'r') as file:
                 cookies = json.load(file)
             self.cookies = [{'key':cookie['name'], 'value':cookie['value']} for cookie in cookies]
-        
+        else:
+            print("Error: ", "No cookies found")
+            return
         yield SeleniumRequest(url=url, callback=self.do_post_reply)
 
 
@@ -140,6 +142,8 @@ class ReplySpider(scrapy.Spider):
         except Exception as e:
             print("Error: ", e)
 
+    def get_cookies_file(self,uid:int):
+        return f"cookies/{uid}.json"
     def mysql_init(self):
         host = self.crawler.settings.get('X_MYSQL_HOST')
         user = self.crawler.settings.get('X_MYSQL_USER')

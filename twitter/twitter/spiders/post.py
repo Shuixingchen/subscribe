@@ -8,6 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import pymysql
 import json
 import os
+from twitter.funcs import get_cookies_file
 
 # 获取用户粉丝爬虫，只能获取最新的50条数据
 class PostSpider(scrapy.Spider):
@@ -20,7 +21,7 @@ class PostSpider(scrapy.Spider):
         print("do post uid: ", uid)
     
         url = "https://x.com"
-        file_path = self.get_cookies_file(uid)
+        file_path = get_cookies_file(uid)
         if os.path.exists(file_path):
             with open(file_path, 'r') as file:
                 cookies = json.load(file)
@@ -236,9 +237,6 @@ class PostSpider(scrapy.Spider):
         )
         self.cursor = self.conn.cursor()
         
-
-    def get_cookies_file(self,uid:int):
-        return f"cookies/{uid}.json"
     
     def get_user_id(self):
         try:

@@ -8,6 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import pymysql
 import json
 import os
+from twitter.funcs import get_cookies_file
 
 class ReplySpider(scrapy.Spider):
     name = "reply"
@@ -20,7 +21,7 @@ class ReplySpider(scrapy.Spider):
         print("do reply uid: ", uid)
         
         url = "https://x.com"
-        file_path = self.get_cookies_file(uid)
+        file_path = get_cookies_file(uid)
         if os.path.exists(file_path):
             with open(file_path, 'r') as file:
                 cookies = json.load(file)
@@ -142,8 +143,6 @@ class ReplySpider(scrapy.Spider):
         except Exception as e:
             print("Error: ", e)
 
-    def get_cookies_file(self,uid:int):
-        return f"cookies/{uid}.json"
     def mysql_init(self):
         host = self.crawler.settings.get('X_MYSQL_HOST')
         user = self.crawler.settings.get('X_MYSQL_USER')

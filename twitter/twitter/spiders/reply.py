@@ -48,7 +48,7 @@ class ReplySpider(scrapy.Spider):
     def post_replay(self, response, reply):
         try:
             driver = response.request.meta["driver"]
-            print("reply: ", reply['user_name'])
+            
             # 给浏览器添加Cookie
             if hasattr(self, 'cookies'):
                 for item in self.cookies:
@@ -66,7 +66,12 @@ class ReplySpider(scrapy.Spider):
             article = articles[0]
             article_content = article.text
             print("article: ", article_content)
+            if len(article_content) < 10:
+                print("Error: ", "No article content found")
+                return ""
             reply_content = GPTAPI().get_cn_response(article_content)
+            print("reply user: ", reply['user_name'])
+            print("reply content: ", reply_content)
             # 鼠标移动到文章上面
             actions.move_to_element(article).perform()
             time.sleep(1)

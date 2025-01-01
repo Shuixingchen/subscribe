@@ -21,3 +21,11 @@ class GPTAPI:
                   {'role': 'user', 'content': prompt}]
         )
         return completion.model_dump_json()
+    
+    def get_random_content(self):
+        completion = self.client.chat.completions.create(
+        model="qwen-plus",
+        messages=[{'role': 'system', 'content': "You're a crypto enthusiast"},
+                  {'role': 'user', 'content': "Please tell me about a random crypto event, less than 50 waords"}]
+        )
+        return completion.model_dump_json()

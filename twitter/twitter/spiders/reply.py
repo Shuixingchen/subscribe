@@ -9,6 +9,7 @@ import pymysql
 import json
 import os
 from twitter.funcs import get_cookies_file
+from twitter.gptapi import GPTAPI
 
 class ReplySpider(scrapy.Spider):
     name = "reply"
@@ -37,8 +38,6 @@ class ReplySpider(scrapy.Spider):
         for reply in reply_list:
             if reply['user_name'] == "":
                 continue
-            if reply['content'] == "":
-                continue
             origin_post_url = self.post_replay(response,reply)
             if origin_post_url == "":
                 continue
@@ -47,7 +46,7 @@ class ReplySpider(scrapy.Spider):
     def post_replay(self, response, reply):
         try:
             driver = response.request.meta["driver"]
-            print("reply: ", reply)
+            # print("reply: ", reply)
             # 给浏览器添加Cookie
             if hasattr(self, 'cookies'):
                 for item in self.cookies:
@@ -63,7 +62,9 @@ class ReplySpider(scrapy.Spider):
                 print("Error: ", "No articles found")
                 return ""
             article = articles[0]
-            # print("article: ", article.get_attribute('outerHTML'))
+            article_content = article.text
+            print("article: ", article_content)
+            reply_content = GPTAPI().get_cn_response(article_content)
             # 鼠标移动到文章上面
             actions.move_to_element(article).perform()
             time.sleep(1)
@@ -77,7 +78,7 @@ class ReplySpider(scrapy.Spider):
             tweet_input = tweet_inputs[0]
             # 模拟键盘输入数据
             tweet_input.click()
-            tweet_input.send_keys(reply['content'])
+            tweet_input.send_keys(reply_content)
             # reply 按钮
             reply_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button[data-testid="tweetButtonInline"]')))
             # 将鼠标移动到元素

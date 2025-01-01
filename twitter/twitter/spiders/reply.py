@@ -1,4 +1,6 @@
 import scrapy
+import logging
+import traceback
 from scrapy_selenium import SeleniumRequest
 from selenium.webdriver import ActionChains
 import time
@@ -46,7 +48,7 @@ class ReplySpider(scrapy.Spider):
     def post_replay(self, response, reply):
         try:
             driver = response.request.meta["driver"]
-            # print("reply: ", reply)
+            print("reply: ", reply['user_name'])
             # 给浏览器添加Cookie
             if hasattr(self, 'cookies'):
                 for item in self.cookies:
@@ -87,8 +89,8 @@ class ReplySpider(scrapy.Spider):
             reply_button.click()
             time.sleep(3)
             return last_url
-        except Exception as e:
-            print("Error: ", e)
+        except:
+            logging.error(traceback.format_exc())
             return ""
 
     def get_reply_list(self):
@@ -121,8 +123,8 @@ class ReplySpider(scrapy.Spider):
                     "content_id": content['id']
                 })
             return reply_list
-        except Exception as e:
-            print("Error: ", e)
+        except:
+            logging.error("get_reply_list",traceback.format_exc())
     def save_reply_log(self, data):
         try:
             insert_log_sql = """
@@ -130,8 +132,8 @@ class ReplySpider(scrapy.Spider):
             """
             self.cursor.execute(insert_log_sql, (data['user_id'], data['content_id'], data['origin_post_url']))
             self.conn.commit()
-        except Exception as e:
-            print("Error: ", e)
+        except:
+            logging.error("save_reply_log",traceback.format_exc())
     
     def get_user_id(self):
         try:
@@ -141,8 +143,8 @@ class ReplySpider(scrapy.Spider):
             self.cursor.execute(query_user_id,())
             user_id = self.cursor.fetchone()
             return user_id['id']
-        except Exception as e:
-            print("Error: ", e)
+        except:
+            logging.error("get_user_id",traceback.format_exc())
 
     def mysql_init(self):
         host = self.crawler.settings.get('X_MYSQL_HOST')

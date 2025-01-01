@@ -1,4 +1,6 @@
 import scrapy
+import logging
+import traceback
 from scrapy_selenium import SeleniumRequest
 from selenium.webdriver import ActionChains
 import time
@@ -8,6 +10,8 @@ from selenium.webdriver.support import expected_conditions as EC
 import pymysql
 import json
 import os
+from twitter.funcs import get_cookies_file
+from twitter.gptapi import GPTAPI
 
 class ReplySpider(scrapy.Spider):
     name = "reply"
@@ -20,7 +24,7 @@ class ReplySpider(scrapy.Spider):
         print("do reply uid: ", uid)
         
         url = "https://x.com"
-        file_path = self.get_cookies_file(uid)
+        file_path = get_cookies_file(uid)
         if os.path.exists(file_path):
             with open(file_path, 'r') as file:
                 cookies = json.load(file)
@@ -36,8 +40,6 @@ class ReplySpider(scrapy.Spider):
         for reply in reply_list:
             if reply['user_name'] == "":
                 continue
-            if reply['content'] == "":
-                continue
             origin_post_url = self.post_replay(response,reply)
             if origin_post_url == "":
                 continue
@@ -46,7 +48,7 @@ class ReplySpider(scrapy.Spider):
     def post_replay(self, response, reply):
         try:
             driver = response.request.meta["driver"]
-            print("reply: ", reply)
+            
             # 给浏览器添加Cookie
             if hasattr(self, 'cookies'):
                 for item in self.cookies:
@@ -62,7 +64,14 @@ class ReplySpider(scrapy.Spider):
                 print("Error: ", "No articles found")
                 return ""
             article = articles[0]
-            # print("article: ", article.get_attribute('outerHTML'))
+            article_content = article.text
+            print("article: ", article_content)
+            if len(article_content) < 10:
+                print("Error: ", "No article content found")
+                return ""
+            reply_content = GPTAPI().get_cn_response(article_content)
+            print("reply user: ", reply['user_name'])
+            print("reply content: ", reply_content)
             # 鼠标移动到文章上面
             actions.move_to_element(article).perform()
             time.sleep(1)
@@ -76,7 +85,7 @@ class ReplySpider(scrapy.Spider):
             tweet_input = tweet_inputs[0]
             # 模拟键盘输入数据
             tweet_input.click()
-            tweet_input.send_keys(reply['content'])
+            tweet_input.send_keys(reply_content)
             # reply 按钮
             reply_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button[data-testid="tweetButtonInline"]')))
             # 将鼠标移动到元素
@@ -85,8 +94,8 @@ class ReplySpider(scrapy.Spider):
             reply_button.click()
             time.sleep(3)
             return last_url
-        except Exception as e:
-            print("Error: ", e)
+        except:
+            logging.error(traceback.format_exc())
             return ""
 
     def get_reply_list(self):
@@ -119,8 +128,8 @@ class ReplySpider(scrapy.Spider):
                     "content_id": content['id']
                 })
             return reply_list
-        except Exception as e:
-            print("Error: ", e)
+        except:
+            logging.error("get_reply_list",traceback.format_exc())
     def save_reply_log(self, data):
         try:
             insert_log_sql = """
@@ -128,8 +137,8 @@ class ReplySpider(scrapy.Spider):
             """
             self.cursor.execute(insert_log_sql, (data['user_id'], data['content_id'], data['origin_post_url']))
             self.conn.commit()
-        except Exception as e:
-            print("Error: ", e)
+        except:
+            logging.error("save_reply_log",traceback.format_exc())
     
     def get_user_id(self):
         try:
@@ -139,11 +148,9 @@ class ReplySpider(scrapy.Spider):
             self.cursor.execute(query_user_id,())
             user_id = self.cursor.fetchone()
             return user_id['id']
-        except Exception as e:
-            print("Error: ", e)
+        except:
+            logging.error("get_user_id",traceback.format_exc())
 
-    def get_cookies_file(self,uid:int):
-        return f"cookies/{uid}.json"
     def mysql_init(self):
         host = self.crawler.settings.get('X_MYSQL_HOST')
         user = self.crawler.settings.get('X_MYSQL_USER')

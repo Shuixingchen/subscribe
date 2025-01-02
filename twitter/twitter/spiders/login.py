@@ -50,7 +50,12 @@ class LoginSpider(scrapy.Spider):
             # 点击下一步
             actions = ActionChains(driver)
             next_buttons = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'button[role="button"]')))
-            next_button = next_buttons[3]
+            for i, button in enumerate(next_buttons):
+                print(f"Button {i+1} HTML:")
+                print(button.text)
+                if button.text == "Next" or button.text == "下一步":
+                    next_button = button
+                    break
             actions.move_to_element(next_button).perform()
             time.sleep(1)
             next_button.click()
@@ -59,14 +64,15 @@ class LoginSpider(scrapy.Spider):
             user_input = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[data-testid="ocfEnterTextTextInput"]')))
             user_input.send_keys(x_username)
             
+
             # 点击下一步
             next_buttons_2 = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'button[role="button"]')))
-            # for i, button in enumerate(next_buttons_2):
-            #     print(f"Button {i+1} HTML:")
-            #     print(button.get_attribute('outerHTML'))
-            next_button = next_buttons_2[2]
+            for i, button in enumerate(next_buttons_2):
+                print(f"Button {i+1} HTML:")
+                print(button.get_attribute('outerHTML'))
+            next_button = next_buttons_2[1]
             actions.move_to_element(next_button).perform()
-            time.sleep(1)
+            time.sleep(10)
             next_button.click()
 
             # 输入密码
@@ -85,8 +91,52 @@ class LoginSpider(scrapy.Spider):
             cookies = driver.get_cookies()
             # print("cookies:",cookies)
             self.save_cookies(cookies, uid)
+            time.sleep(1)
+            return True
+        except:
+            logging.error("login",traceback.format_exc())
+            return False
+    def x_login_new(self, response, user):
+        try:
+            x_email = user['email']
+            x_password = user['password']
+            x_username = user['username']
+            uid = user['id']
+            driver = response.request.meta["driver"]
+            wait = WebDriverWait(driver, 60)  # 设置最大等待时间为10秒
+            
+            # 找到登录用户名input
+            email_input = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[autocomplete="username"]')))
+            email_input.send_keys(x_username)
+
+            # 点击下一步
+            actions = ActionChains(driver)
+            next_buttons = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'button[role="button"]')))
+            next_button = next_buttons[3]
+            actions.move_to_element(next_button).perform()
+            time.sleep(1)
+            next_button.click()
+
+             # 输入密码
+            password_input = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[name="password"]')))
+            password_input.send_keys(x_password)
+
+            # 点击登录
+            login_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button[data-testid="LoginForm_Login_Button"]')))
+            actions.move_to_element(login_button).perform()
+            time.sleep(1)
+            login_button.click()
+
+            # 等待页面 URL 发生变化，表示登录完成
+            wait.until(EC.url_changes(driver.current_url))
+            time.sleep(3)
+            # 获取当前页面的所有 cookie
+            cookies = driver.get_cookies()
+            # print("cookies:",cookies)
+            self.save_cookies(cookies, uid)
             time.sleep(10)
             return True
+
         except:
             logging.error("login",traceback.format_exc())
             return False

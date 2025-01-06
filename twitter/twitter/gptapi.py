@@ -39,5 +39,9 @@ class GPTAPI:
         message = data['choices'][0]['message']['content']
         if len(message) > 159:
             message = message[:159]
-        return message
+        
+        return self.remove_non_bmp_characters(message)
     
+    def remove_non_bmp_characters(text):
+        # 移除非BMP字符
+        return ''.join(char for char in text if ord(char) < 65536)

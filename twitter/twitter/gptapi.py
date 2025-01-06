@@ -42,6 +42,6 @@ class GPTAPI:
         
         return self.remove_non_bmp_characters(message)
     
-    def remove_non_bmp_characters(text):
+    def remove_non_bmp_characters(self,text:str):
         # 移除非BMP字符
         return ''.join(char for char in text if ord(char) < 65536)

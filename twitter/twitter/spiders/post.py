@@ -42,7 +42,7 @@ class PostSpider(scrapy.Spider):
                     driver.add_cookie({'name': item['key'], 'value': item['value']})
                 time.sleep(5)
             
-            driver.get(self.start_urls[0])
+            # driver.get(self.start_urls[0])
             wait = WebDriverWait(driver, 60)  # 设置最大等待时间为10秒
             # 聚焦富文本可编辑元素
             tweet_inputs = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div[data-testid="tweetTextarea_0"]')))

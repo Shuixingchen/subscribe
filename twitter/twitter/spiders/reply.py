@@ -102,7 +102,7 @@ class ReplySpider(scrapy.Spider):
         try:
             
             query_big_user = """
-            SELECT * from t_big_users
+            SELECT * from t_big_users where status = 1 limit 3
             """
             query_reply_content = """
             SELECT * from t_reply_content order by id desc limit 1

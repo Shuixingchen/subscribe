@@ -1,5 +1,6 @@
 from openai import OpenAI
 from twitter.settings import OPENAI_API_KEY
+import json
 
 class GPTAPI:
     def __init__(self):
@@ -13,19 +14,30 @@ class GPTAPI:
         messages=[{'role': 'system', 'content': "You're a crypto enthusiast and like to respond to other people's tweets in one sentence and in a positive way and in a positive way"},
                   {'role': 'user', 'content': prompt}]
         )
-        return completion.model_dump_json()
+        return self.parser_response(completion.model_dump_json())
     def get_en_response(self, prompt):
         completion = self.client.chat.completions.create(
         model="qwen-plus",
+        extra_body={"enable_search": True},
         messages=[{'role': 'system', 'content': "You're a crypto enthusiast and like to respond to other people's tweets in one sentence and in a positive way, in English"},
                   {'role': 'user', 'content': prompt}]
         )
-        return completion.model_dump_json()
+        return self.parser_response(completion.model_dump_json())
     
     def get_random_content(self):
         completion = self.client.chat.completions.create(
         model="qwen-plus",
+        max_tokens=50,
+        extra_body={"enable_search": True},
         messages=[{'role': 'system', 'content': "You're a crypto enthusiast"},
-                  {'role': 'user', 'content': "Please tell me about a random crypto event, less than 50 waords"}]
+                  {'role': 'user', 'content': "Please tell me a random one sentence, must less than 50 words"}]
         )
-        return completion.model_dump_json()
+        return self.parser_response(completion.model_dump_json())
+    
+    def parser_response(self, response:str):
+        data = json.loads(response)
+        message = data['choices'][0]['message']['content']
+        if len(message) > 159:
+            message = message[:159]
+        return message
+    

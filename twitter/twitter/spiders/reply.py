@@ -102,25 +102,17 @@ class ReplySpider(scrapy.Spider):
         try:
             
             query_big_user = """
-            SELECT * from t_big_users where status = 1 limit 3
+            SELECT * from t_big_users where status = 1 and id not in (SELECT uid from t_reply_log where date(created_at)=curdate()) limit 3
             """
             query_reply_content = """
             SELECT * from t_reply_content order by id desc limit 1
-            """
-            query_had_reply_today = """
-            SELECT uid from t_reply_log where date(created_at)=curdate()
             """
             self.cursor.execute(query_big_user)
             users = self.cursor.fetchall()
             self.cursor.execute(query_reply_content)
             content = self.cursor.fetchone()
-            self.cursor.execute(query_had_reply_today)
-            had_reply_today = self.cursor.fetchall()
             reply_list = []
             for user in users:
-                user_exists = any(user['id'] == row['uid'] for row in had_reply_today)
-                if user_exists:
-                    continue
                 reply_list.append({
                     "user_id": user['id'],
                     "user_name": user['username'],

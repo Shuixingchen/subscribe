@@ -41,7 +41,7 @@ class LoginSpider(scrapy.Spider):
             x_username = user['username']
             uid = user['id']
             driver = response.request.meta["driver"]
-            wait = WebDriverWait(driver, 60)  # 设置最大等待时间为10秒
+            wait = WebDriverWait(driver, 10)  # 设置最大等待时间为10秒
 
             # 找到登录用户名input
             email_input = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[autocomplete="username"]')))
@@ -51,7 +51,7 @@ class LoginSpider(scrapy.Spider):
             actions = ActionChains(driver)
             next_buttons = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'button[role="button"]')))
             for i, button in enumerate(next_buttons):
-                print(f"Button {i+1} HTML:")
+                print(f"email Button {i+1} HTML:")
                 print(button.text)
                 if button.text == "Next" or button.text == "下一步":
                     next_button = button
@@ -60,22 +60,23 @@ class LoginSpider(scrapy.Spider):
             time.sleep(1)
             next_button.click()
 
-            # 输入用户名
-            user_input = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[data-testid="ocfEnterTextTextInput"]')))
-            user_input.send_keys(x_username)
-            
-
-            # 点击下一步
-            next_buttons_2 = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'button[role="button"]')))
-            for i, button in enumerate(next_buttons_2):
-                print(f"Button {i+1} HTML:")
-                print(button.text)
-                if button.text == "Next" or button.text == "下一步":
-                    next_button = button
-                    break
-            actions.move_to_element(next_button).perform()
-            time.sleep(10)
-            next_button.click()
+            # 输入用户名, 有时候这个页面会没有
+            try:
+                user_input = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[data-testid="ocfEnterTextTextInput"]')))
+                user_input.send_keys(x_username)
+                # 点击下一步
+                next_buttons_2 = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'button[role="button"]')))
+                for i, button in enumerate(next_buttons_2):
+                    print(f"username Button {i+1} HTML:")
+                    print(button.text)
+                    if button.text == "Next" or button.text == "下一步":
+                        next_button = button
+                        break
+                actions.move_to_element(next_button).perform()
+                time.sleep(10)
+                next_button.click()
+            except:
+                logging.error("直接输入密码...",)
 
             # 输入密码
             password_input = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[name="password"]')))

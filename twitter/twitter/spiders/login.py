@@ -69,8 +69,10 @@ class LoginSpider(scrapy.Spider):
             next_buttons_2 = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'button[role="button"]')))
             for i, button in enumerate(next_buttons_2):
                 print(f"Button {i+1} HTML:")
-                print(button.get_attribute('outerHTML'))
-            next_button = next_buttons_2[1]
+                print(button.text)
+                if button.text == "Next" or button.text == "下一步":
+                    next_button = button
+                    break
             actions.move_to_element(next_button).perform()
             time.sleep(10)
             next_button.click()

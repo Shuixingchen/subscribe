@@ -28,8 +28,7 @@ class Db:
             """
             self.cursor.execute(query_user_id,())
             user_id = self.cursor.fetchone()
-            # return user_id['id']
-            return 4
+            return user_id['id']
         except Exception as e:
             print("Error: ", e)
     def get_big_user(self):

@@ -100,7 +100,7 @@ FEED_EXPORT_ENCODING = "utf-8"
 SELENIUM_DRIVER_NAME = 'chrome'
 # SELENIUM_DRIVER_EXECUTABLE_PATH = which('chromedriver')
 # SELENIUM_DRIVER_EXECUTABLE_PATH = '/Users/admin/learn/subscribe/chromedriver-mac-x64'
-SELENIUM_DRIVER_EXECUTABLE_PATH = os.getenv("SELENIUM_DRIVER_EXECUTABLE_PATH")
+# SELENIUM_DRIVER_EXECUTABLE_PATH = os.getenv("SELENIUM_DRIVER_EXECUTABLE_PATH")
 
 SELENIUM_DRIVER_ARGUMENTS=[
     '--headless',
@@ -113,7 +113,8 @@ SELENIUM_DRIVER_ARGUMENTS=[
 # SELENIUM_DRIVER_ARGUMENTS=[]  
  
 DOWNLOADER_MIDDLEWARES = {
-    'scrapy_selenium.SeleniumMiddleware': 800
+    # 'scrapy_selenium.SeleniumMiddleware': 800
+    'twitter.seleniumMiddleware.SeleniumMiddleware': 800,
 }
 
 X_EMAIL = os.getenv("X_EMAIL")

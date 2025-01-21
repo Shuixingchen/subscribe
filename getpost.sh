@@ -20,23 +20,23 @@ fi
 cd ./twitter || { echo "进入项目目录失败."; exit 1; }
 
 # 设置全局或本地Python版本为指定的虚拟环境
-pyenv activate $ENV_NAME
+pyenv activate $ENV_NAME;scrapy crawl getpost;
 
 # 检查激活是否成功
-if [ $? -ne 0 ]; then
-    echo "激活虚拟环境 $ENV_NAME 失败."
-    exit 1
-fi
+# if [ $? -ne 0 ]; then
+#     echo "激活虚拟环境 $ENV_NAME 失败."
+#     exit 1
+# fi
 
-# 运行Scrapy爬虫
-scrapy crawl getpost
+# # 运行Scrapy爬虫
+# scrapy crawl getpost
 
-# 检查命令执行状态
-if [ $? -ne 0 ]; then
-    echo "运行Scrapy爬虫失败."
-else
-    echo "Scrapy爬虫运行完成."
-fi
+# # 检查命令执行状态
+# if [ $? -ne 0 ]; then
+#     echo "运行Scrapy爬虫失败."
+# else
+#     echo "Scrapy爬虫运行完成."
+# fi
 
-# 退出虚拟环境
-pyenv deactivate
+# # 退出虚拟环境
+# pyenv deactivate

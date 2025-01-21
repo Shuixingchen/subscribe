@@ -1,9 +1,13 @@
 import requests
 import json
 import logging
+import random
+import time
 def get_cookies_file(uid:int):
     return f"cookies/{uid}.json"
 
+def rand_time_wait():
+    time.sleep(random.randint(1, 5))
 def send_notice(url,content:str):
     if not url or not content:
         return

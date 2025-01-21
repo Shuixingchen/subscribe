@@ -12,7 +12,7 @@ import json
 import os
 from twitter.funcs import get_cookies_file
 from twitter.gptapi import GPTAPI
-from twitter.funcs import send_notice
+from twitter.funcs import send_notice,rand_time_wait
 
 
 class GetpostSpider(scrapy.Spider):
@@ -100,6 +100,7 @@ class GetpostSpider(scrapy.Spider):
                 res = self.db.save_big_user_post(data)
                 if res:
                     self.send_notice("twitter", data)
+                rand_time_wait()
         except:
             logging.error(traceback.format_exc())
             return ""

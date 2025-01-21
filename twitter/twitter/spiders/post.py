@@ -23,12 +23,15 @@ class PostSpider(scrapy.Spider):
         uid = self.get_user_id()
         print("do post uid: ", uid)
     
-        url = "https://x.com"
+        url = "https://x.com/home"
         file_path = get_cookies_file(uid)
         if os.path.exists(file_path):
             with open(file_path, 'r') as file:
                 cookies = json.load(file)
             self.cookies = [{'key':cookie['name'], 'value':cookie['value']} for cookie in cookies]
+        else:
+            logging.info("cookies not found")
+            return
         
         yield SeleniumRequest(url=url, callback=self.send_post)
 
@@ -41,12 +44,15 @@ class PostSpider(scrapy.Spider):
                 for item in self.cookies:
                     driver.add_cookie({'name': item['key'], 'value': item['value']})
                 time.sleep(5)
-            
-            # driver.get(self.start_urls[0])
-            wait = WebDriverWait(driver, 60)  # 设置最大等待时间为10秒
+            wait = WebDriverWait(driver, 10)  # 设置最大等待时间为10秒
+            try:
             # 聚焦富文本可编辑元素
-            tweet_inputs = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div[data-testid="tweetTextarea_0"]')))
-            tweet_input = tweet_inputs[0]
+                tweet_inputs = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div[data-testid="tweetTextarea_0"]')))
+                tweet_input = tweet_inputs[0]
+            except:
+                logging.error("textarea no found")
+                self.write_file(driver)
+                return
         
             # 模拟键盘输入数据
             post_content = GPTAPI().get_random_content()
@@ -66,57 +72,6 @@ class PostSpider(scrapy.Spider):
         except:
             logging.error("send_post",traceback.format_exc())
        
-    def do_login(self, response):
-        x_email = self.crawler.settings.get('X_EMAIL')
-        x_password = self.crawler.settings.get('X_PASSWORD')
-        x_username = self.crawler.settings.get('X_USERNAME')
-        driver = response.request.meta["driver"]
-        wait = WebDriverWait(driver, 60)  # 设置最大等待时间为10秒
-
-        # 找到登录用户名input
-        email_input = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[autocomplete="username"]')))
-        email_input.send_keys(x_email)
-
-        # 点击下一步
-        actions = ActionChains(driver)
-        next_buttons = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'button[role="button"]')))
-        next_button = next_buttons[3]
-        actions.move_to_element(next_button).perform()
-        time.sleep(1)
-        next_button.click()
-
-        # 输入用户名
-        user_input = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[data-testid="ocfEnterTextTextInput"]')))
-        user_input.send_keys(x_username)
-        
-        # 点击下一步
-        next_buttons_2 = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'button[role="button"]')))
-        # for i, button in enumerate(next_buttons_2):
-        #     print(f"Button {i+1} HTML:")
-        #     print(button.get_attribute('outerHTML'))
-        next_button = next_buttons_2[2]
-        actions.move_to_element(next_button).perform()
-        time.sleep(1)
-        next_button.click()
-
-        # 输入密码
-        password_input = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[name="password"]')))
-        password_input.send_keys(x_password)
-
-        # 点击登录
-        login_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button[data-testid="LoginForm_Login_Button"]')))
-        actions.move_to_element(login_button).perform()
-        login_button.click()
-
-        # 等待页面 URL 发生变化，表示登录完成
-        wait.until(EC.url_changes(driver.current_url))
-        time.sleep(3)
-        # 获取当前页面的所有 cookie
-        cookies = driver.get_cookies()
-        print("cookies:",cookies)
-        self.save_cookies(cookies)
-        time.sleep(10)
-
     def write_file(self, driver):
         html_source = driver.page_source
         with open('webpage.html', 'a', encoding='utf-8') as file:

@@ -9,10 +9,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import twitter.db as db
 import json
+import random
 import os
 from twitter.funcs import get_cookies_file
 from twitter.gptapi import GPTAPI
-from twitter.funcs import send_notice,rand_time_wait
+from twitter.funcs import send_notice,rand_time_wait_minute,rand_time_wait_second
 
 
 class GetpostSpider(scrapy.Spider):
@@ -42,11 +43,13 @@ class GetpostSpider(scrapy.Spider):
         yield SeleniumRequest(url=url, callback=self.get_post)
     def get_post(self,response):
         try:
-            users = self.db.get_big_user()
-            for user in users:
-                if user['username'] == "":
-                    continue
-                self.parse(response,user)
+            while True:
+                users = self.db.get_big_user()
+                for user in users:
+                    if user['username'] == "":
+                        continue
+                    self.parse(response,user)
+                rand_time_wait_minute()
         except:
             logging.error(traceback.format_exc())
             return ""
@@ -56,10 +59,9 @@ class GetpostSpider(scrapy.Spider):
             # 跳到大v主页
             driver.get("https://x.com/"+user['username'])
             wait = WebDriverWait(driver, 60)  # 设置最大等待时间为10秒
-            actions = ActionChains(driver)
             # 滚动页面
             ActionChains(driver) \
-            .scroll_by_amount(0, 200) \
+            .scroll_by_amount(0, random.randint(150, 300)) \
             .perform()
             articles = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div[data-testid="tweetText"]')))
             if len(articles) == 0:
@@ -100,7 +102,7 @@ class GetpostSpider(scrapy.Spider):
                 res = self.db.save_big_user_post(data)
                 if res:
                     self.send_notice("twitter", data)
-                rand_time_wait()
+                rand_time_wait_second()
         except:
             logging.error(traceback.format_exc())
             return ""

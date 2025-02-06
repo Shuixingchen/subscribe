@@ -53,7 +53,7 @@ class Db:
             hash_object.update(article.encode('utf-8'))
             post_hash = hash_object.hexdigest()
             insert_log_sql = """
-            INSERT INTO t_big_user_post (username, social,post_id,post_time,post_hash) VALUES (%s,%s,%s,%s)
+            INSERT INTO t_big_user_post (username, social,post_id,post_time,post_hash) VALUES (%s,%s,%s,%s,%s)
             """
             self.cursor.execute(insert_log_sql,(data['username'],data['social'],data['post_id'],data['post_time'],post_hash))
             return True

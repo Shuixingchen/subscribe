@@ -1,6 +1,7 @@
 import pymysql
 from dotenv import load_dotenv
 import os
+import hashlib
 load_dotenv()
 
 class Db:
@@ -43,10 +44,18 @@ class Db:
             print("Error: ", e)
     def save_big_user_post(self,data):
         try:
+            article = data['article']
+            if len(article) == 0:
+                return False
+            if 'minutes' not in data['post_time']:
+                return False
+            hash_object = hashlib.md5()
+            hash_object.update(article.encode('utf-8'))
+            post_hash = hash_object.hexdigest()
             insert_log_sql = """
-            INSERT INTO t_big_user_post (username, social,post_id,post_time) VALUES (%s,%s,%s,%s)
+            INSERT INTO t_big_user_post (username, social,post_id,post_time,post_hash) VALUES (%s,%s,%s,%s)
             """
-            self.cursor.execute(insert_log_sql,(data['username'],data['social'],data['post_id'],data['post_time']))
+            self.cursor.execute(insert_log_sql,(data['username'],data['social'],data['post_id'],data['post_time'],post_hash))
             return True
         except Exception as e:
             print("Error: ", e)

@@ -7,11 +7,11 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import pymysql
 import json
 import os
 from twitter.funcs import get_cookies_file
 from twitter.gptapi import GPTAPI
+import twitter.db as db
 
 # 获取用户粉丝爬虫，只能获取最新的50条数据
 class PostSpider(scrapy.Spider):
@@ -19,8 +19,8 @@ class PostSpider(scrapy.Spider):
     allowed_domains = ["x.com","sannysoft.com"]
     start_urls = ["https://x.com/home","https://x.com"]
     def start_requests(self):
-        self.mysql_init()
-        uid = self.get_user_id()
+        self.db = db.Db()
+        uid = self.db.get_user_id()
         print("do post uid: ", uid)
     
         url = "https://x.com/home"
@@ -88,45 +88,4 @@ class PostSpider(scrapy.Spider):
         with open('headers.json', 'w') as file:
             json.dump(headers_dict, file, indent=4)
 
-    def get_post_content(self,response):
-        host = self.crawler.settings.get('X_MYSQL_HOST')
-        user = self.crawler.settings.get('X_MYSQL_USER')
-        password = self.crawler.settings.get('X_MYSQL_PASSWORD')
-        database = self.crawler.settings.get('X_MYSQL_DATABASE')
-        port = self.crawler.settings.get('X_MYSQL_PORT')
-        self.conn = pymysql.connect(
-            host=host,
-            user=user,
-            password=password,
-            database=database,
-            port=int(port),
-            cursorclass=pymysql.cursors.DictCursor
-        )
-        self.cursor = self.conn.cursor()
         
-    
-    def get_user_id(self):
-        try:
-            query_user_id = """
-            SELECT id from t_users where status = 1
-            """
-            self.cursor.execute(query_user_id,())
-            user_id = self.cursor.fetchone()
-            return user_id['id']
-        except Exception as e:
-            print("Error: ", e)
-    def mysql_init(self):
-        host = self.crawler.settings.get('X_MYSQL_HOST')
-        user = self.crawler.settings.get('X_MYSQL_USER')
-        password = self.crawler.settings.get('X_MYSQL_PASSWORD')
-        database = self.crawler.settings.get('X_MYSQL_DATABASE')
-        port = self.crawler.settings.get('X_MYSQL_PORT')
-        self.conn = pymysql.connect(
-            host=host,
-            user=user,
-            password=password,
-            database=database,
-            port=int(port),
-            cursorclass=pymysql.cursors.DictCursor
-        )
-        self.cursor = self.conn.cursor()

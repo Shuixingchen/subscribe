@@ -9,8 +9,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import json
 import os
-import pymysql
 from twitter.funcs import get_cookies_file
+import twitter.db as db
 
 class LoginSpider(scrapy.Spider):
     name = "login"
@@ -18,22 +18,24 @@ class LoginSpider(scrapy.Spider):
     start_urls = ["https://x.com"]
 
     def start_requests(self):
+        self.db = db.Db()
         url = "https://x.com/i/flow/login"
         yield SeleniumRequest(url=url, callback=self.do_login)
 
     def parse(self, response):
         pass
     def do_login(self, response):
-        users = self.get_users()
-        for user in users:
-            cookiefile = get_cookies_file(user['id'])
-            if os.path.exists(cookiefile):
-                continue
-            res = self.x_login(response, user)
-            if res:
-                print(f"{user['username']} 登录成功")
-            else:
-                print(f"{user['username']} 登录失败")
+        user = self.db.get_user()
+        print("do login uid: ", user['id'])
+        cookiefile = get_cookies_file(user['id'])
+        if os.path.exists(cookiefile):
+            print(f"{user['username']} 已经登录")
+            return
+        res = self.x_login(response, user)
+        if res:
+            print(f"{user['username']} 登录成功")
+        else:
+            print(f"{user['username']} 登录失败")
     def x_login(self, response, user):
         try:
             x_email = user['email']
@@ -150,27 +152,5 @@ class LoginSpider(scrapy.Spider):
         with open(cookie_file, 'w+') as file:  # 以文本模式打开文件
             json.dump(cookies, file, indent=4) 
     
-    def get_users(self):
-        try:
-            host = self.crawler.settings.get('X_MYSQL_HOST')
-            user = self.crawler.settings.get('X_MYSQL_USER')
-            password = self.crawler.settings.get('X_MYSQL_PASSWORD')
-            database = self.crawler.settings.get('X_MYSQL_DATABASE')
-            port = self.crawler.settings.get('X_MYSQL_PORT')
-            self.conn = pymysql.connect(
-                host=host,
-                user=user,
-                password=password,
-                database=database,
-                port=int(port),
-                cursorclass=pymysql.cursors.DictCursor
-            )
-            self.cursor = self.conn.cursor()
-            query_user = """
-            SELECT `id`, `username`, `email`, `password` FROM t_users where status = 1
-            """
-            self.cursor.execute(query_user)
-            return self.cursor.fetchall()
-        except Exception as e:
-            print("Error:",e)
+
 

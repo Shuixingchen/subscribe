@@ -1,0 +1,71 @@
+<html><head>
+  <meta charset="utf-8">
+  <title></title>
+  <link href="https://abs.twimg.com/favicons/twitter.3.ico" rel="shortcut icon" type="image/x-icon">
+  <link href="https://abs-0.twimg.com/bouncer/bouncer_responsive.43a19843bc90721886def60c110eb08c20d200f7.css" rel="stylesheet">
+  
+</head>
+<body class="ResponsiveLayout ResponsiveLayout--Night">
+    <div class="TopNav">
+      <div class="TopNav--container u-cf">
+        
+        
+        <div class="Icon--logo u-pullLeft">
+          <a href="https://twitter.com"><svg role="img" aria-label="X" width="24" height="24"><g><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></g></svg>
+</a>
+        </div>
+        <div class="TopNav-title u-pullLeft"></div>
+        <ul class="u-pullRight">
+            <li class="Dropdown  js-userDropdown">
+              <span>Options</span>
+              <b class="caret"></b>
+              <div class="Dropdown-menuContainer">
+                <div class="Dropdown-menu Dropdown--right">
+                  <div class="Dropdown-caretContainer">
+                    <span class="Dropdown-caretOuter"></span>
+                    <span class="Dropdown-caretInner"></span>
+                  </div>
+                  <ul>
+                          <li><a href="https://support.twitter.com/articles/20171312" title="Help" target="_blank">Help</a></li>
+                          <li class="js-logoutLink">
+                            <button type="button">Log out</button>
+                            <form class="js-logoutForm" action="/logout" method="post">
+                              <input type="hidden" value="c7ba92e2a5dd1622304f8e90c784af182fec3bb9" name="authenticity_token">
+                            </form>
+                          </li>
+                  </ul>
+                </div>
+              </div>
+            </li>
+        </ul>
+      </div>
+    </div>
+  <div class="PageContainer">
+        <div class="Section">
+      
+          <div class="circle-loader-container">
+      <div class="circle-loader"></div>
+    </div>
+    <form id="arkose_form" action="/account/access" method="post" class="Form" onsubmit="return false">
+      <input type="hidden" name="authenticity_token" value="c7ba92e2a5dd1622304f8e90c784af182fec3bb9">
+<input type="hidden" name="assignment_token" value="1851581426">
+<input type="hidden" name="lang" value="en">
+<input type="hidden" name="flow" value="">
+<noscript>
+  <input type="hidden" name="nsi" value="1">
+</noscript>
+
+      <input id="verification_string" name="verification_string" class="Form-textbox Edge-textbox is-required" type="textbox">
+      <input type="hidden" id="language_code" name="language_code" value="en">
+    </form>
+    <iframe id="arkose_iframe" src="https://iframe.arkoselabs.com/0152B4EB-D2DC-460A-89A1-629838B529C9/index.html?mkt=en&amp;data=Cnap6DKYR5t8e6ZY.QazIVSZvpQdlrhPExA/pdBgupJ1jfpFJO3DZcBPQhMVGZUsKkGaYRF6o+dx+3BK8z+OZEyOCGctLUcnLECzNB1B1MZrpTkonrSidxnrVmovF7XG8BlIrto74vMK35WWHdwuYghD1Fw1J5y8uDgTpp2cRAxxRHU2h+wZa/C4aCTsfBGFhz3A8SNyeZwOo5wO+Y1H3Qrrd+8NbdCdd0IlzcTrEvzgrHXIHWG+0UbcTTOXwkL8awg2QDPsU9PFfsGwpnwDW8CZo9Uy3Wr9DxKawuUPRwtlrRpj1spKWwGk5dbqO2nfHxYPpmzJE7kKJAF/LFtr6In7hXFWinPHWkPD0QjMmjEUcaUMhILGJxEpQFMY7gBDNlCSEM/EPWVpWffSl73WwvTQSOD24znx7g7xk2WKfHRDAzwL/uuvu5egAFCUAKRbz4zKmYnN/rjk55MvbU9izqJSBmxSnNN9duFTliPtNwDEUnAzo99jTEmAOWm4EX48oRGPFKj8pe5zlcaa7xqyxug033sVafKxrFzxr1le2zwuHDJ27syq91GSs1y20L0g=" class="inactive" style="height: 500px; width: 558px;"></iframe>
+    <script nonce="" src="./static/js/arkose.js" type="application/json"></script>
+
+    </div>
+
+  </div>
+    <script src="//abs-0.twimg.com/bouncer/bouncer_js.2e7ff392fed43e1e1623bce5219e5e8312cb273c.js" type="text/javascript"></script>
+  
+
+
+</body></html>

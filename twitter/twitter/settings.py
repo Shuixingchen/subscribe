@@ -102,15 +102,15 @@ SELENIUM_DRIVER_NAME = 'chrome'
 # SELENIUM_DRIVER_EXECUTABLE_PATH = '/Users/admin/learn/subscribe/chromedriver-mac-x64'
 # SELENIUM_DRIVER_EXECUTABLE_PATH = os.getenv("SELENIUM_DRIVER_EXECUTABLE_PATH")
 
-SELENIUM_DRIVER_ARGUMENTS=[
-    '--headless',
-    '--disable-gpu',
-    '--disable-unicode',
-    'window-size=1920x1080',
-    '--start-maximized',
-    'user-agent='+os.getenv("USER_AGENT")
-    ]  
-# SELENIUM_DRIVER_ARGUMENTS=[]  
+# SELENIUM_DRIVER_ARGUMENTS=[
+#     '--headless',
+#     '--disable-gpu',
+#     '--disable-unicode',
+#     'window-size=1920x1080',
+#     '--start-maximized',
+#     'user-agent='+os.getenv("USER_AGENT")
+#     ]  
+SELENIUM_DRIVER_ARGUMENTS=[]  
  
 DOWNLOADER_MIDDLEWARES = {
     # 'scrapy_selenium.SeleniumMiddleware': 800

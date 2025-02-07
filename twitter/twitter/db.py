@@ -71,12 +71,15 @@ class Db:
         try:
             article = data['article']
             if len(article) == 0:
+                print("article invalid: ", article)
                 return False
-            if 'minutes' not in data['post_time']:
+            if 'minutes' not in data['post_time'] and 'seconds' not in data['post_time']:
+                print("time invalid: ", data['post_time'])
                 return False
             hash_object = hashlib.md5()
             hash_object.update(article.encode('utf-8'))
             post_hash = hash_object.hexdigest()
+            print("post_hash: ", post_hash)
             insert_log_sql = """
             INSERT INTO t_big_user_post (username, social,post_id,post_time,post_hash) VALUES (%s,%s,%s,%s,%s)
             """

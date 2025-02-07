@@ -17,14 +17,10 @@ class TestSpider(scrapy.Spider):
         self.db = db.Db()
         uid = self.db.get_user_id()
         print("do reply uid: ", uid)
-
-        # message = """
-        # 有谁知道最近哪些meme币比较有前景啊？
-        # """
-        # res = GPTAPI().get_cn_response(message)
-        # print(res)
-        # return
-        yield SeleniumRequest(url=self.start_urls[0], callback=self.do_login)
+        data = {'username': 'elonmusk', 'article': 'Doesn’t it seem odd that none of the supposed beneficiaries of USAID are complaining? Just the government-funded “NGOs”. ', 'post_id': 'https://x.com/elonmusk/status/1887672075633950947', 'social': '', 'post_time': '35 seconds ago'}
+        res = self.db.save_big_user_post(data)
+        print(res)
+        # yield SeleniumRequest(url=self.start_urls[0], callback=self.do_login)
     def parse(self, response):
         print("parse")
         time.sleep(300)

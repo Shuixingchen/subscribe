@@ -104,7 +104,7 @@ class GetpostSpider(scrapy.Spider):
                     self.send_notice("twitter", data)
                 rand_time_wait_second()
         except:
-            logging.error(traceback.format_exc())
+            # logging.error(traceback.format_exc())
             return ""
     def send_notice(self,title,data):
          # 构造消息内容

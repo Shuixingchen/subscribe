@@ -7,7 +7,7 @@ def get_cookies_file(uid:int):
     return f"cookies/{uid}.json"
 
 def rand_time_wait_second():
-    time.sleep(random.randint(1, 60))
+    time.sleep(random.randint(1, 30))
 def rand_time_wait_minute():
     time.sleep(random.randint(1, 10)*60)
 def send_notice(url,content:str):

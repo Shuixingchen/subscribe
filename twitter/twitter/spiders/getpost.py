@@ -38,7 +38,7 @@ class GetpostSpider(scrapy.Spider):
                 return
         except:
             logging.error("Error: start_requests")
-            logging.error(traceback.format_exc())
+            # logging.error(traceback.format_exc())
             return
         yield SeleniumRequest(url=url, callback=self.get_post)
     def get_post(self,response):
@@ -50,6 +50,7 @@ class GetpostSpider(scrapy.Spider):
                         continue
                     print("getpost from : ", user['username'])
                     self.parse(response,user)
+                    rand_time_wait_second()
                 rand_time_wait_minute()
         except:
             logging.error(traceback.format_exc())
@@ -59,18 +60,32 @@ class GetpostSpider(scrapy.Spider):
             driver = response.request.meta["driver"]
             # 跳到大v主页
             driver.get("https://x.com/"+user['username'])
-            wait = WebDriverWait(driver, 60)  # 设置最大等待时间为10秒
+            wait = WebDriverWait(driver, 10)  # 设置最大等待时间为10秒
             # 滚动页面
             ActionChains(driver) \
-            .scroll_by_amount(0, random.randint(150, 300)) \
+            .scroll_by_amount(0, random.randint(200, 300)) \
             .perform()
-            articles = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div[data-testid="tweetText"]')))
-            if len(articles) == 0:
-                print("Error: ", "No articles found")
+            try:
+                articles = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div[data-testid="tweetText"]')))
+                if len(articles) == 0:
+                    print("Info: ", "No articles found")
+                    return ""
+            except:
+                print("Error: ", "articles No found")
                 return ""
-            social_pinneds = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div[data-testid="socialContext"]')))
-            social_reposted = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'span[data-testid="socialContext"]')))
-            socials = social_pinneds + social_reposted
+            socials = []
+            try:
+                social_pinneds = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div[data-testid="socialContext"]')))
+                socials = social_pinneds
+            except:
+                print("Warning: ", "social_pinneds No found")
+                pass
+            try:
+                social_reposted = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'span[data-testid="socialContext"]')))
+                socials = socials+ social_reposted
+            except:
+                print("Warning: ", "social_reposted No found")
+                pass
             headers = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div[data-testid="User-Name"]')))
             post_headers = []
             for i,header in enumerate(headers):
@@ -103,9 +118,8 @@ class GetpostSpider(scrapy.Spider):
                 res = self.db.save_big_user_post(data)
                 if res:
                     self.send_notice("twitter", data)
-                rand_time_wait_second()
         except:
-            # logging.error(traceback.format_exc())
+            logging.error(traceback.format_exc())
             return ""
     def send_notice(self,title,data):
          # 构造消息内容

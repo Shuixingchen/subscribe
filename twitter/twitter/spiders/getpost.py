@@ -48,6 +48,7 @@ class GetpostSpider(scrapy.Spider):
                 for user in users:
                     if user['username'] == "":
                         continue
+                    print("getpost from : ", user['username'])
                     self.parse(response,user)
                 rand_time_wait_minute()
         except:

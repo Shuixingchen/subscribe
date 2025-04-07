@@ -9,7 +9,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from twitter.funcs import get_cookies_file
-from twitter.db import Db
+import twitter.db as db
+from collections import deque
 
 # 获取用户粉丝爬虫，只能获取最新的50条数据
 class FollowerSpider(scrapy.Spider):
@@ -19,10 +20,15 @@ class FollowerSpider(scrapy.Spider):
                   "https://x.com/runtoweb3/following",
                   "https://x.com/runtoweb3/followers"
                 ]
-    db = Db()
+    quenue = deque()
 
     def start_requests(self):
-        uid = self.db.get_user_id()
+        self.db = db.Db()
+        x_uid = os.getenv(self.name.upper()+'_USER_ID')
+        if x_uid is None:
+            uid = self.db.get_user_id()
+        else:
+            uid = int(x_uid)
         print("do post uid: ", uid)
     
         url = "https://x.com/home"
@@ -34,18 +40,23 @@ class FollowerSpider(scrapy.Spider):
         else:
             logging.info("cookies not found")
             return
-        
         yield SeleniumRequest(url=url, callback=self.parse)
 
     def parse(self, response):
+       self.db.get_big_user()
+       while True:
+            if len(self.quenue) == 0:
+                self.quenue.extend(self.start_urls)
+            url = self.quenue.popleft()
+       
+    def get_follower(self, response):
         driver = response.request.meta["driver"]
         follows = []
         # 给浏览器添加Cookie
         for item in self.cookies:
             driver.add_cookie({'name': item['key'], 'value': item['value']})
         driver.get(self.start_urls[2])
-        wait = WebDriverWait(driver, 60)  # 设置最大等待时间为10秒
-        time.sleep(3)
+        wait = WebDriverWait(driver, 10)  # 设置最大等待时间为10秒
         elements = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div[data-testid="cellInnerDiv"]')))
         for f in elements:
             try:
@@ -61,12 +72,3 @@ class FollowerSpider(scrapy.Spider):
             .scroll_by_amount(0, 300) \
             .perform()
         unique_list = list(dict.fromkeys(follows))
-        with open('webpagt.txt', 'a', encoding='utf-8') as file:
-            file.write('\n'.join(unique_list))
-       
-    def parse_bot_test(self, response):
-        driver = response.request.meta["driver"]
-        driver.get('https://bot.sannysoft.com/')    #加载机器人检测页面，可以从各项指标判断当前程序是否为机器人
-        source = driver.page_source
-        with open('result.html', 'w') as f:
-            f.write(source)
